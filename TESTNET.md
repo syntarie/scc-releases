@@ -89,17 +89,27 @@ Expected: `"balance":100`. (Assuming the address was previously empty.)
 
 You need a `scc-node` binary to generate keys. Two paths:
 
-**Option A — pre-built binaries (recommended for Linux x86_64)**:
+**Option A — one-line install (recommended)**:
+
+```bash
+curl -sSL https://github.com/syntarie/scc-releases/releases/download/testnet-2026-04-26/install.sh | sh
+```
+
+The script auto-detects your platform (Linux / macOS, x86_64 / arm64), downloads the matching `scc-tui` binary into `~/.local/bin`, and prints the quickstart. Set `SCC_BINS="scc-tui scc-node"` to install both. Set `SCC_INSTALL_DIR=/usr/local/bin` (with sudo) to install system-wide.
+
+The binaries live in a separate **public** repo (`syntarie/scc-releases`) — the source repo is private. Only the build artifacts are public so anyone can install + use the testnet.
+
+**Option A2 — direct download** (if you'd rather not pipe to sh):
 
 The release includes both `scc-node` (the protocol binary, used by validators and CLI clients) and `scc-tui` (the wallet UI). Most users only need `scc-tui`.
 
 ```bash
 # Wallet (most users want this):
-curl -L -o scc-tui https://github.com/syntarie/syntarie_blockchain/releases/download/testnet-2026-04-26/scc-tui
+curl -L -o scc-tui https://github.com/syntarie/scc-releases/releases/download/testnet-2026-04-26/scc-tui
 chmod +x scc-tui
 
 # Or the CLI / validator binary:
-curl -L -o scc-node https://github.com/syntarie/syntarie_blockchain/releases/download/testnet-2026-04-26/scc-node
+curl -L -o scc-node https://github.com/syntarie/scc-releases/releases/download/testnet-2026-04-26/scc-node
 chmod +x scc-node
 
 # Verify checksums (optional but recommended)
