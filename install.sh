@@ -14,18 +14,20 @@
 #   SCC_REPO         Public mirror repo (default: syntarie/scc-releases)
 #   SCC_TAG          Release tag (default: testnet-2026-04-26)
 #   SCC_INSTALL_DIR  Where to put the binary (default: $HOME/.local/bin)
-#   SCC_BINS         Which binaries to install (default: scc-tui)
-#                    Set to "scc-tui scc-node" to also get the protocol/CLI binary.
+#   SCC_BINS         Which binaries to install
+#                    Default: "scc-tui scc-node" (both — TUI for end-users,
+#                    scc-node for keygen + CLI scripting).
+#                    Set to "scc-tui" only if you don't want the CLI.
 #
-#   Bash/zsh:  SCC_BINS="scc-tui scc-node" curl -sSL <url> | sh
-#   Fish:      env SCC_BINS="scc-tui scc-node" curl -sSL <url> | sh
+#   Bash/zsh:  SCC_BINS="scc-tui" curl -sSL <url> | sh
+#   Fish:      env SCC_BINS="scc-tui" curl -sSL <url> | sh
 #
 set -eu
 
 REPO="${SCC_REPO:-syntarie/scc-releases}"
 TAG="${SCC_TAG:-testnet-2026-04-26}"
 INSTALL_DIR="${SCC_INSTALL_DIR:-$HOME/.local/bin}"
-BINS="${SCC_BINS:-scc-tui}"
+BINS="${SCC_BINS:-scc-tui scc-node}"
 
 err() { printf '\033[1;31merror:\033[0m %s\n' "$*" >&2; exit 1; }
 log() { printf '\033[1;34m==>\033[0m %s\n' "$*"; }
@@ -105,8 +107,11 @@ printf 'the faucet. Use the standard transfer flow to send tokens.\n\n'
 printf '\033[1;33mKeep ~/my.key safe.\033[0m It is your wallet — anyone with that file can\n'
 printf 'spend your tokens. For testnet that means losing test funds; on mainnet\n'
 printf 'it would mean losing real ones.\n\n'
+printf 'Optional — protocol CLI for scripting (already installed):\n'
+printf '  scc-node key-address ~/my.key                # print your address\n'
+printf '  scc-node transfer-intent --rpc-url <url> --to <addr> --amount 50\n\n'
 printf 'Verify your install (optional):\n'
-printf '  sha256sum %s/scc-tui\n' "$INSTALL_DIR"
+printf '  sha256sum %s/scc-tui %s/scc-node\n' "$INSTALL_DIR" "$INSTALL_DIR"
 printf '  # Compare to SHA256SUMS-%s.txt on the release page.\n\n' "$PLATFORM"
 printf 'Public testnet docs: https://testnet.syntarie.com\n'
 printf 'Source repo: https://github.com/%s\n\n' "$REPO"
