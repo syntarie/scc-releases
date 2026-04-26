@@ -101,23 +101,27 @@ The binaries live in a separate **public** repo (`syntarie/scc-releases`) — th
 
 **Option A2 — direct download** (if you'd rather not pipe to sh):
 
-The release includes both `scc-node` (the protocol binary, used by validators and CLI clients) and `scc-tui` (the wallet UI). Most users only need `scc-tui`.
+The release includes platform-suffixed binaries for `scc-node` (the protocol binary, used by validators and CLI clients) and `scc-tui` (the wallet UI). Most users only need `scc-tui`.
+
+| Platform | Wallet binary URL |
+|---|---|
+| Linux x86_64 | `.../testnet-2026-04-26/scc-tui-linux-x86_64` |
+| macOS Apple Silicon (M1/M2/M3) | `.../testnet-2026-04-26/scc-tui-darwin-arm64` |
+| Windows x86_64 | `.../testnet-2026-04-26/scc-tui-windows-x86_64.exe` |
+
+(Replace `scc-tui-` with `scc-node-` for the protocol/CLI binary. Intel Mac is built from source — see Option B.)
 
 ```bash
-# Wallet (most users want this):
-curl -L -o scc-tui https://github.com/syntarie/scc-releases/releases/download/testnet-2026-04-26/scc-tui
+# Linux example:
+curl -L -o scc-tui https://github.com/syntarie/scc-releases/releases/download/testnet-2026-04-26/scc-tui-linux-x86_64
 chmod +x scc-tui
 
-# Or the CLI / validator binary:
-curl -L -o scc-node https://github.com/syntarie/scc-releases/releases/download/testnet-2026-04-26/scc-node
-chmod +x scc-node
-
-# Verify checksums (optional but recommended)
-sha256sum scc-tui scc-node
-# Compare to the SHA256 block on the release page.
+# Verify checksum (optional but recommended)
+sha256sum scc-tui
+# Compare to SHA256SUMS-linux-x86_64.txt on the release page.
 ```
 
-Both binaries are statically linked (no `librocksdb` runtime dependency) and built from `dev/main` at `9fcc9f5`. The scc-node build is the same one running on the testnet validators — what you build locally is what you talk to.
+All binaries are statically linked (no `librocksdb` runtime dependency) and built by GitHub Actions from `dev/main`. The Linux scc-node build is the same architecture running on the testnet validators — what you talk to.
 
 **Option B — build from source** (any platform):
 
