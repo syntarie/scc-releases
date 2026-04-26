@@ -38,8 +38,12 @@ INSTALL_DIR="${SCC_INSTALL_DIR:-$HOME/.local/bin}"
 BINS="${SCC_BINS:-scc-tui scc-node}"
 ASSUME_YES="${SCC_YES:-}"
 
-# ─── Colors (only if stdout is a terminal) ──────────────────────────────────
-if [ -t 1 ]; then
+# ─── Colors (on by default; honor NO_COLOR and TERM=dumb) ──────────────────
+# `[ -t 1 ]` is unreliable under `curl | sh`, so we default ON and let the
+# user opt out with NO_COLOR=1 or TERM=dumb (the standard conventions).
+if [ -n "${NO_COLOR:-}" ] || [ "${TERM:-}" = "dumb" ]; then
+  C_RED= C_GREEN= C_YELLOW= C_BLUE= C_CYAN= C_DIM= C_RESET=
+else
   C_RED=$'\033[1;31m'
   C_GREEN=$'\033[1;32m'
   C_YELLOW=$'\033[1;33m'
@@ -47,8 +51,6 @@ if [ -t 1 ]; then
   C_CYAN=$'\033[1;36m'
   C_DIM=$'\033[2m'
   C_RESET=$'\033[0m'
-else
-  C_RED= C_GREEN= C_YELLOW= C_BLUE= C_CYAN= C_DIM= C_RESET=
 fi
 
 err()  { printf '%serror:%s %s\n' "$C_RED" "$C_RESET" "$*" >&2; exit 1; }
@@ -113,11 +115,21 @@ sha256_of() {
   fi
 }
 
-# ─── Try to read a binary's --version (graceful no-op for binaries without it)
+# ─── Try to read a binary's --version, safely. ──────────────────────────────
+# Some Syntarie binaries (scc-tui in particular) parse args manually and may
+# enter interactive mode on unrecognized flags. We skip the probe for those
+# and always attach </dev/null + a hard timeout for the rest.
 binary_version() {
-  local bin_path="$1"
-  if [ -x "$bin_path" ]; then
-    "$bin_path" --version 2>/dev/null | head -1 || true
+  local bin_path="$1" base
+  if [ ! -x "$bin_path" ]; then return; fi
+  base=$(basename "$bin_path")
+  case "$base" in
+    scc-tui*) return ;;  # no clap, no --version flag — don't probe
+  esac
+  if command -v timeout >/dev/null 2>&1; then
+    timeout 2 "$bin_path" --version </dev/null 2>/dev/null | head -1 || true
+  else
+    "$bin_path" --version </dev/null 2>/dev/null | head -1 || true
   fi
 }
 
